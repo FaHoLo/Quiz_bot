@@ -38,7 +38,7 @@ def collect_questions_and_answers(quiz_path):
     return collect_q_and_a_from_text(text)
 
 def get_text_from_file(file_path):
-    encoding = os.getenv('TEXT_ENCODING', 'KOI8-R')
+    encoding = os.getenv('QUIZ_TEXT_ENCODING', 'KOI8-R')
     with open(file_path, 'r', encoding=encoding) as file:
         text = file.read()
     return text
