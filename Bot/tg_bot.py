@@ -111,12 +111,10 @@ async def send_question(message: types.Message):
 async def give_up(message: types.Message):
     user_id = f'tg_{message.chat.id}'
     correct_answer = qq.get_correct_answer(user_id, QUIZ_PATH, redis_db)
-    question = qq.get_random_question(QUIZ_PATH)
-    redis_db.set(user_id, question)
 
+    await Status.waiting_command.set()
     await message.answer(f'Правильный ответ:\n{correct_answer}')
-    await message.answer(question)
-    tg_logger.debug(f'Correct answer and new question was sent to chat {user_id}')
+    tg_logger.debug(f'Correct answer was sent to chat {user_id}')
 
 @dp.message_handler(state=Status.waiting_answer)
 async def get_answer(message: types.Message, state: FSMContext):
