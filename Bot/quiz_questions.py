@@ -16,7 +16,9 @@ def get_question_answer(question, quiz_path):
     return questions_and_answers[question]
 
 def remove_explanations_from_answer(answer):
-    answer_ending = answer.find('.')
+    answer_ending = answer.find('(')
+    if answer_ending == -1:
+        answer_ending = answer.find('.')
     if answer_ending != -1:
         answer = answer[:answer_ending]
     return answer
