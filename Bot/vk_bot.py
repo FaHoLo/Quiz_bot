@@ -4,6 +4,7 @@ import logging
 import log_config
 import quiz_questions as qq
 from dotenv import load_dotenv
+from textwrap import dedent
 
 import vk_api
 from vk_api.utils import get_random_id
@@ -58,13 +59,13 @@ def answer_to_user(event, vk_api_methods, redis_db, quiz_path):
 
 def send_welcome_and_keyboard(event, vk_api_methods):
     keyboard = create_keyboard()
-    text = '''
+    text = dedent('''\
     Привет! Я бот для викторин.
     Действия кнопок:
     "Новый вопрос" - я вышлю новый вопрос викторины,
     "Сдаться" - получить правильный ответ и новый вопрос,
     "Мой счет" - количество заработанных тобой баллов.
-    '''
+    ''')
     vk_api_methods.messages.send(
         user_id=event.user_id,
         random_id=get_random_id(),

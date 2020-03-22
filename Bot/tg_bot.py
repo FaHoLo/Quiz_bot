@@ -5,6 +5,7 @@ import logging
 import log_config
 import quiz_questions as qq
 from dotenv import load_dotenv
+from textwrap import dedent
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher import FSMContext
@@ -75,7 +76,7 @@ async def cancel_quiz(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands=['help'], state='*')
 async def send_help(message: types.Message, state: FSMContext):
-    help_text = '''
+    help_text = dedent('''\
     Я бот для викторин.
     Нажми /start, чтобы начать викторину.
     Действия кнопок:
@@ -83,7 +84,7 @@ async def send_help(message: types.Message, state: FSMContext):
     "Сдаться" - получить правильный ответ и новый вопрос,
     "Мой счет" - количество заработанных тобой баллов.
     Нажми /cancel для окончания викторины.
-    '''.replace('    ', '')
+    ''')
     await message.answer(help_text)
     tg_logger.debug('Help message was sent')
 
