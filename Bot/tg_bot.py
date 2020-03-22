@@ -121,7 +121,7 @@ async def give_up(message: types.Message):
 @dp.message_handler(state=Status.waiting_answer)
 async def get_answer(message: types.Message, state: FSMContext):
     user_id = f'tg_{message.chat.id}'
-    answer = qq.handle_answer(message.text)
+    answer = qq.remove_explanations_from_answer(message.text)
     if qq.check_answer(answer, user_id, QUIZ_PATH, redis_db):
         text = 'Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»'
         await Status.waiting_command.set()

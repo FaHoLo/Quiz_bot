@@ -96,7 +96,8 @@ def get_answer(event, redis_db, quiz_path):
         text = f'Твой счет: {score} правильных ответа.'
         vk_logger.debug('Got score')
     else:
-        if qq.check_answer(event.text, user_id, quiz_path, redis_db):
+        answer = remove_explanations_from_answer(event.text)
+        if qq.check_answer(answer, user_id, quiz_path, redis_db):
             text = 'Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»'
         else:
             text = 'Неверный ответ или команда. Попробуешь еще раз?'

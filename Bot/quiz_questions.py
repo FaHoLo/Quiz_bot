@@ -15,7 +15,7 @@ def get_question_answer(question, quiz_path):
     questions_and_answers = collect_questions_and_answers(quiz_path)
     return questions_and_answers[question]
 
-def handle_answer(answer):
+def remove_explanations_from_answer(answer):
     answer_ending = answer.find('.')
     if answer_ending != -1:
         answer = answer[:answer_ending]
