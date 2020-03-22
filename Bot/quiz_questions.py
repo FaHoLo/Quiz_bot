@@ -52,6 +52,6 @@ def collect_q_and_a_from_text(text):
         if section.startswith('Вопрос '):
             question = section[10:].replace('\n', ' ').lstrip()
         if section.startswith('Ответ:'):
-            answer = section[7:]
+            answer = section[7:].replace('\n', ' ')
             questions_and_answers[question] = answer
     return questions_and_answers
