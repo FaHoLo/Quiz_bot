@@ -90,35 +90,39 @@ async def send_help(message: types.Message, state: FSMContext):
 
 @dp.message_handler(Text(equals='Мой счет', ignore_case=True), state='*')
 async def send_score(message: types.Message):
+    user_id = f'tg_{message.chat.id}'
     # TODO calculate score
-    score = qq.get_user_score(message.chat.id)
+    score = qq.get_user_score(user_id)
     await message.answer(f'Твой счет: {score} правильных ответа.')
     tg_logger.debug('Score was sent')
 
 @dp.message_handler(Text(equals='Новый вопрос', ignore_case=True), state=Status.waiting_command)
 async def send_question(message: types.Message):
+    user_id = f'tg_{message.chat.id}'
     question = qq.get_random_question(QUIZ_PATH)
-    redis_db.set(message.chat.id, question)
+    redis_db.set(user_id, question)
     tg_logger.debug('Question was sent to user and into db')
 
     await Status.next()
     await message.answer(question)
-    tg_logger.debug(f'Question was sent to chat {message.chat.id}')
+    tg_logger.debug(f'Question was sent to chat {user_id}')
 
 @dp.message_handler(Text(equals='Сдаться', ignore_case=True), state=Status.waiting_answer)
 async def give_up(message: types.Message):
-    correct_answer = qq.get_correct_answer(message.chat.id, QUIZ_PATH, redis_db)
+    user_id = f'tg_{message.chat.id}'
+    correct_answer = qq.get_correct_answer(user_id, QUIZ_PATH, redis_db)
     question = qq.get_random_question(QUIZ_PATH)
-    redis_db.set(message.chat.id, question)
+    redis_db.set(user_id, question)
 
     await message.answer(f'Правильный ответ:\n{correct_answer}')
     await message.answer(question)
-    tg_logger.debug(f'Correct answer and new question was sent to chat {message.chat.id}')
+    tg_logger.debug(f'Correct answer and new question was sent to chat {user_id}')
 
 @dp.message_handler(state=Status.waiting_answer)
 async def get_answer(message: types.Message, state: FSMContext):
+    user_id = f'tg_{message.chat.id}'
     answer = qq.handle_answer(message.text)
-    if qq.check_answer(answer, message.chat.id, QUIZ_PATH, redis_db):
+    if qq.check_answer(answer, user_id, QUIZ_PATH, redis_db):
         text = 'Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»'
         await Status.waiting_command.set()
         tg_logger.debug('Got correct answer')

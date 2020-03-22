@@ -83,19 +83,20 @@ def create_keyboard():
     return keyboard
 
 def get_answer(event, redis_db, quiz_path):
+    user_id = f'vk_{event.user_id}'
     if event.text == 'Новый вопрос':
         text = qq.get_random_question(quiz_path)
-        redis_db.set(event.user_id, text)
+        redis_db.set(user_id, text)
         vk_logger.debug('Got new question and sent it into db')
     elif event.text == 'Сдаться':
-        text = qq.get_correct_answer(event.user_id, quiz_path, redis_db)
+        text = qq.get_correct_answer(user_id, quiz_path, redis_db)
         vk_logger.debug('Got correct answer')
     elif event.text == 'Мой счет':
-        score = qq.get_user_score(event.user_id)
+        score = qq.get_user_score(user_id)
         text = f'Твой счет: {score} правильных ответа.'
         vk_logger.debug('Got score')
     else:
-        if qq.check_answer(event.text, event.user_id, quiz_path, redis_db):
+        if qq.check_answer(event.text, user_id, quiz_path, redis_db):
             text = 'Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»'
         else:
             text = 'Неверный ответ или команда. Попробуешь еще раз?'
