@@ -1,5 +1,6 @@
 import os
 import random
+from more_itertools import flatten
 
 
 def get_random_question(quiz_path):
@@ -46,12 +47,11 @@ def get_text_from_file(file_path):
 def collect_q_and_a_from_text(text):
     question_infos = text.split('\n\n\n')
     questions_and_answers = {}
-    for question_info in question_infos:
-        for section in question_info.split('\n\n'):
-            if section.startswith('Вопрос '):
-                question = section[10:].replace('\n', ' ').lstrip()
-            if section.startswith('Ответ:'):
-                answer = section[7:]
-        questions_and_answers[question] = answer
+    sections = flatten([question_info.split('\n\n') for question_info in question_infos])
+    for section in sections:
+        if section.startswith('Вопрос '):
+            question = section[10:].replace('\n', ' ').lstrip()
+        if section.startswith('Ответ:'):
+            answer = section[7:]
+            questions_and_answers[question] = answer
     return questions_and_answers
-
