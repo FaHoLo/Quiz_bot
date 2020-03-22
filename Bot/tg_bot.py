@@ -121,7 +121,9 @@ async def get_answer(message: types.Message, state: FSMContext):
     user_id = f'tg_{message.chat.id}'
     answer = qq.remove_explanations_from_answer(message.text)
     if qq.check_answer(answer, user_id, QUIZ_PATH, redis_db):
-        text = 'Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»'
+        correct_answer = qq.get_correct_answer(user_id, QUIZ_PATH, redis_db)
+        text = f'Правильно! {correct_answer}\nДля следующего вопроса нажми «Новый вопрос»'
+        
         await Status.waiting_command.set()
         tg_logger.debug('Got correct answer')
     else:
