@@ -54,6 +54,6 @@ def collect_q_and_a_from_text(text):
                     question = question[1:]
             if section.startswith('Ответ:'):
                 answer = section[7:]
-        questions_and_answers.update({question: answer})
+        questions_and_answers[question] = answer
     return questions_and_answers
 
