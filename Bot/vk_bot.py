@@ -1,15 +1,16 @@
-import os
-import redis
 import logging
-import log_config
-import quiz_questions as qq
-from dotenv import load_dotenv
-from textwrap import dedent
+import os
 
+from dotenv import load_dotenv
+import redis
+from textwrap import dedent
 import vk_api
 from vk_api.utils import get_random_id
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+
+import log_config
+import quiz_questions as qq
 
 
 vk_logger = logging.getLogger('vk_logger')
@@ -17,7 +18,7 @@ vk_logger = logging.getLogger('vk_logger')
 
 def main():
     logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[log_config.SendToTelegramHandler()]
     )
     load_dotenv()
@@ -35,6 +36,7 @@ def main():
             vk_logger.exception('')
             continue
 
+
 def start_vk_bot(vk_token, redis_db, quiz_path):
     vk_session = vk_api.VkApi(token=vk_token)
     vk_api_methods = vk_session.get_api()
@@ -44,6 +46,7 @@ def start_vk_bot(vk_token, redis_db, quiz_path):
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             answer_to_user(event, vk_api_methods, redis_db, quiz_path)
+
 
 def answer_to_user(event, vk_api_methods, redis_db, quiz_path):
     if event.text.lower() == 'Привет'.lower():
@@ -56,6 +59,7 @@ def answer_to_user(event, vk_api_methods, redis_db, quiz_path):
             message=text,
         )
         vk_logger.debug('Various answer was sent')
+
 
 def send_welcome_and_keyboard(event, vk_api_methods):
     keyboard = create_keyboard()
@@ -74,6 +78,7 @@ def send_welcome_and_keyboard(event, vk_api_methods):
     )
     vk_logger.debug('Welcome was sent')
 
+
 def create_keyboard():
     keyboard = VkKeyboard()
     keyboard.add_button('Новый вопрос', color=VkKeyboardColor.PRIMARY)
@@ -81,6 +86,7 @@ def create_keyboard():
     keyboard.add_line()
     keyboard.add_button('Мой счет', color=VkKeyboardColor.DEFAULT)
     return keyboard
+
 
 def get_answer(event, redis_db, quiz_path):
     user_id = f'vk_{event.user_id}'
@@ -96,12 +102,13 @@ def get_answer(event, redis_db, quiz_path):
         text = f'Твой счет: {score} правильных ответа.'
         vk_logger.debug('Got score')
     else:
-        answer = remove_explanations_from_answer(event.text)
+        answer = qq.remove_explanations_from_answer(event.text)
         if qq.check_answer(answer, user_id, quiz_path, redis_db):
             text = 'Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»'
         else:
             text = 'Неверный ответ или команда. Попробуешь еще раз?'
     return text
+
 
 if __name__ == "__main__":
     main()
